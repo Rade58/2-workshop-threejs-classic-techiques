@@ -5,8 +5,6 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import gsap from "gsap";
 import GUI from "lil-gui";
 
-/
-
 /**
  * @description Debug UI - lil-ui
  */
