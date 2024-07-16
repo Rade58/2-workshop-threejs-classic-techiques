@@ -48,120 +48,42 @@ if (canvas) {
 
   const scene = new THREE.Scene();
 
-  // LOADING THE FONT --------------------------------------------------------
-
-  const fontLoader = new FontLoader();
-
-  fontLoader.load("/fonts/gentilis_regular.typeface.json", (myFont) => {
-    console.log("font loaded");
-
-    const textGeometry = new TextGeometry("Hello Rade.js", {
-      font: myFont,
-      size: 0.5,
-      // height: 0.2,// deprecated, ude depth
-      depth: 0.2,
-      // curveSegments: 12,
-      curveSegments: 5,
-      bevelEnabled: true,
-      bevelThickness: 0.03,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      // bevelSegments: 5,
-      bevelSegments: 4,
-    });
-
-    // for centering geometry to the middle of the scene
-    textGeometry.computeBoundingBox(); // sphereBounding is used by default, but we want box bounding
-    console.log(textGeometry.boundingBox); // invisible Box3 instance (just math (coordinates))
-    if (textGeometry.boundingBox) {
-      // this is the way but not the esiest
-      // instead of moving mesh we will move geometry
-      /*  textGeometry.translate(
-        // translate is hee because TextGeometry is also BufferGeometry
-        -(textGeometry.boundingBox.max.x - 0.03) * 0.5, // 0.5 is half, and other number is bevelThicknes
-        -(textGeometry.boundingBox.max.y - 0.02) * 0.5,
-        -(textGeometry.boundingBox.max.z - 0.03) * 0.5
-      ); */
-
-      // this is easier way
-      textGeometry.center(); // also a method of BufferGeometry
-    }
-    // --------------------------------------------------------------------------------------
-    const textureLoader = new THREE.TextureLoader();
-    const matcapTexture = textureLoader.load("/textures/matcaps/3.png");
-    const donutMatcapTexture = textureLoader.load("/textures/matcaps/5.png");
-    //---------------------------------------------------------------------------------------
-
-    const textMaterial = new THREE.MeshMatcapMaterial();
-    textMaterial.matcap = matcapTexture;
-
-    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-
-    scene.add(textMesh);
-
-    // rendering bunch of toruses
-    const donutGeometry = new THREE.TorusGeometry(0.3, 0.2, 20, 45);
-    const donutMaterial = new THREE.MeshMatcapMaterial({
-      matcap: donutMatcapTexture,
-    });
-    // mesuring the time to create bunch of donuts
-
-    console.time("donuts");
-
-    for (let i = 0; i < 200; i++) {
-      const donutMesh = new THREE.Mesh(donutGeometry, donutMaterial);
-
-      donutMesh.position.x = (Math.random() - 0.5) * 10;
-      donutMesh.position.y = (Math.random() - 0.5) * 10;
-      donutMesh.position.z = (Math.random() - 0.5) * 10;
-
-      donutMesh.rotation.x = Math.random() * Math.PI;
-      donutMesh.rotation.y = Math.random() * Math.PI;
-
-      const scale = Math.random();
-
-      donutMesh.scale.setScalar(scale);
-
-      scene.add(donutMesh);
-    }
-
-    console.timeEnd("donuts");
-  });
-
-  // --------------------------------------------------------------
+  // ------  LIGHTS
+  // --------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
   const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-  // scene.add(ambientLight);
+  scene.add(ambientLight);
 
   const pointLight = new THREE.PointLight(0xffffff, 30);
   pointLight.position.x = 2;
   pointLight.position.y = 3;
   pointLight.position.z = 4;
-  // scene.add(pointLight);
+  scene.add(pointLight);
 
-  // ---------------------------------------------------
-  // ---------------------------------------------------
-  // ---------------------------------------------------
-  // ---------------------------------------------------
-  // ---------------------------------------------------
-  // ---------------------------------------------------
-  // ---------------------------------------------------
-  // ---------------------------------------------------
+  // -----------------------------------------------------------------------
+  // ------ MATERIAL ------
+  const material = new THREE.MeshStandardMaterial();
+  material.roughness = 0.4;
 
-  // --------------------------------------------------------------------
-  // --------------------------------------------------------------------
-  // --------------------------------------------------------------------
+  // --------------------------------------------------------------
+  // ------ GEOMETRIES ------
+  const sphereGeo = new THREE.SphereGeometry(0.5, 32, 32);
+  const cubeGeo = new THREE.BoxGeometry(0.75, 0.75, 0.75);
+  const torusGeo = new THREE.TorusGeometry(0.3, 0.2, 32, 64);
+  const planeGeo = new THREE.PlaneGeometry(5, 5);
+  // --------------------------------------------------------------
+  // ------ MESHES ------
+  const sphere = new THREE.Mesh(sphereGeo, material);
+  sphere.position.x = -1.5;
+  const cube = new THREE.Mesh(cubeGeo, material);
+  const torus = new THREE.Mesh(torusGeo, material);
+  torus.position.x = 1.5;
+  const plane = new THREE.Mesh(planeGeo, material);
+  // plane.rotation.x = -Math.PI * 0.5; // this is -90deg
+  // plane.position.y = -0.65;
 
-  // --------------------------------------------------------------------
-  // --------------------------------------------------------------------
-  // --------------------------------------------------------------------
-  // --------------------------------------------------------------------
-
-  //------------------------------------------------------------------------
-  //------------------------------------------------------------------------
-  //------------------------------------------------------------------------
-  //------------------------------------------------------------------------
-  //------------------------------------------------------------------------
-
+  scene.add(sphere, cube, torus, plane);
+  // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -183,7 +105,7 @@ if (canvas) {
 
   const axHelp = new THREE.AxesHelper(4);
   axHelp.setColors("red", "green", "blue");
-  // scene.add(axHelp);
+  scene.add(axHelp);
 
   const orbit_controls = new OrbitControls(camera, canvas);
   // orbit_controls.enabled = false
