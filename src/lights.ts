@@ -5,17 +5,6 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import gsap from "gsap";
 import GUI from "lil-gui";
 
-// WE FIND FONT (AND MAKE SURE WE HAVE A LICENCE)
-// WE THAN CONVER IT WITH https://gero3.github.io/facetype.js/ TO TYPEFACE
-
-// BUT NOW WE WILL DO SOMETHING ELSE
-// we can use typeface font like this (WE HVE CERTAIN FONTS AVAILBLE TO US IN three/examples/fonts)
-// import typefaceFont from "three/examples/fonts/helvetiker_regular.typeface.json";
-
-// or we go to node_modules and we copy font with LICENCE to our /static folder
-// WE ARE JUST PRACTICING HOW WE WOULD USE FONT THAT WE HAVE LICENCE FOR
-// AND HOW TO USE IT IN OUR PROJECT
-
 /**
  * @description Debug UI - lil-ui
  */
@@ -51,15 +40,20 @@ if (canvas) {
   // ------  LIGHTS
   // --------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+  //---------------------------------------------------------------------------------------
+  //---------------------------------------------------------------------------------------
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
   scene.add(ambientLight);
 
-  const pointLight = new THREE.PointLight(0xffffff, 30);
+  /* const pointLight = new THREE.PointLight(0xffffff, 0.5);
   pointLight.position.x = 2;
   pointLight.position.y = 3;
   pointLight.position.z = 4;
   scene.add(pointLight);
-
+ */
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
+  // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // ------ MATERIAL ------
   const material = new THREE.MeshStandardMaterial();

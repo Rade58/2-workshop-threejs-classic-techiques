@@ -5,16 +5,7 @@ import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import gsap from "gsap";
 import GUI from "lil-gui";
 
-// WE FIND FONT (AND MAKE SURE WE HAVE A LICENCE)
-// WE THAN CONVER IT WITH https://gero3.github.io/facetype.js/ TO TYPEFACE
-
-// BUT NOW WE WILL DO SOMETHING ELSE
-// we can use typeface font like this (WE HVE CERTAIN FONTS AVAILBLE TO US IN three/examples/fonts)
-// import typefaceFont from "three/examples/fonts/helvetiker_regular.typeface.json";
-
-// or we go to node_modules and we copy font with LICENCE to our /static folder
-// WE ARE JUST PRACTICING HOW WE WOULD USE FONT THAT WE HAVE LICENCE FOR
-// AND HOW TO USE IT IN OUR PROJECT
+/
 
 /**
  * @description Debug UI - lil-ui
