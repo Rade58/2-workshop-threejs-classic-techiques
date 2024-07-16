@@ -1,3 +1,1 @@
-# Three.js Workshop exercise one - Basics
-
-Basics
+# Three.js Workshop exercise two - Classic Techniques
