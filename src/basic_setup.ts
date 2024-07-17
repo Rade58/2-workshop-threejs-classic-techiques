@@ -1,4 +1,3 @@
-// in this exercise we learn about materials
 import * as THREE from "three";
 import { FontLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
