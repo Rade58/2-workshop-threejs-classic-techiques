@@ -4,6 +4,10 @@
 // ad as few lights as possible
 // Ambient and Hemisphere don't cost that much, then we have directional and point light as moderate cost
 // spot and rectangulatr light are high cost
+
+// some helpers for the lights that ar not on the THREE are available in
+// three/examples/jsm/helpers/
+
 import * as THREE from "three";
 import { FontLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
