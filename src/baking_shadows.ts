@@ -359,6 +359,7 @@ if (canvas) {
     // for dumping to work
     orbit_controls.update();
 
+    //--------------------------------------------------------------
     // updating sphere and plane that represent shadow -----
     sphere.position.x = sphereShadowPlane.position.x =
       Math.sin(elapsedTime) * 1.5;
@@ -366,8 +367,14 @@ if (canvas) {
       Math.cos(elapsedTime) * 1.5;
 
     sphere.position.y = Math.abs(Math.sin(elapsedTime * 3));
-    sphereShadowPlane.scale.setScalar(Math.abs(Math.sin(elapsedTime * 3)));
-    //------------------------------------------------------
+    // insted of doing this (I did this)
+    // sphereShadowPlane.scale.setScalar(Math.abs(Math.sin(elapsedTime * 3)));
+    // author of the workhop used opacity
+    sphereShadowPlane.material.opacity = (1 - sphere.position.y) * 0.7;
+    // sphereShadowPlane.material.opacity = (1 - sphere.position.y) * 0.3;
+    //--------------------------------------------------------------
+    //--------------------------------------------------------------
+
     renderer.render(scene, camera);
 
     window.requestAnimationFrame(tick);
