@@ -1,5 +1,19 @@
-// added shadow
-// for spotlight
+// baking shadows
+// we need to disable shadowMap on rendered, we enbled earlier. This will disable drop shadow
+// than we used baked shadow we build in blender
+
+// problem with this is it is very static, moving meshes won't move or project shadow
+// so if you hve static project, where you don't have moving meshes that should project shadow
+// use this
+// othervise don't
+
+// but we can have other soution where we would use another texture of some simple shadow
+// load that texture on other plane we would hover just a bit above plane
+// we would move object and a mentioned plane as  group (or we can move one and and an another without group but make
+// sure we are moving them at the same time) to produce shadow effect
+// we would use alphaMap to load a texture
+// also don't forget that material needs to be transparent in this case
+
 import * as THREE from "three";
 import { FontLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
@@ -38,6 +52,18 @@ if (canvas) {
 
   const scene = new THREE.Scene();
 
+  // loading the shadow texture
+
+  const textureLoader = new THREE.TextureLoader();
+  const bakedShadowTexture = textureLoader.load(
+    // we will ad this to the material of our plane mesh
+    "/baked_shadow/baked.jpg"
+  );
+
+  const simpleShadowTexture = textureLoader.load(
+    "/baked_shadow/simple_shadow.jpg"
+  );
+
   // ------  LIGHTS
   // --------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
@@ -47,7 +73,7 @@ if (canvas) {
 
   scene.add(ambientLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
 
   directionalLight.position.set(2, 2, -1);
 
@@ -60,12 +86,17 @@ if (canvas) {
   );
   // scene.add(directionalLightHelper);
 
-  const spotLight = new THREE.SpotLight(0xffffff, 0.94, 10, Math.PI * 0.3);
+  const spotLight = new THREE.SpotLight(0xffffff, 0.9, 10, Math.PI * 0.3);
 
   spotLight.position.set(0, 2, 2);
 
   scene.add(spotLight);
   scene.add(spotLight.target);
+
+  const pointLight = new THREE.PointLight(0xffffff, 0.3);
+  scene.add(pointLight);
+
+  pointLight.position.set(-1, 1, 0);
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -84,15 +115,52 @@ if (canvas) {
   // ------ MESHES ------
   const sphere = new THREE.Mesh(sphereGeo, material);
   // sphere.position.x = -1.5;
-  const plane = new THREE.Mesh(planeGeo, material);
+  const plane = new THREE.Mesh(
+    planeGeo,
+    material
+    // new THREE.MeshBasicMaterial({ map: bakedShadowTexture })
+  );
   plane.rotation.x = -Math.PI * 0.5; // this is -90deg
   plane.position.y = -0.65;
+
+  //
+  const sphereShadowPlane = new THREE.Mesh(
+    new THREE.PlaneGeometry(1.5, 1.5),
+    new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      alphaMap: simpleShadowTexture,
+    })
+  );
+
+  sphereShadowPlane.rotation.x = -Math.PI * 0.5;
+  sphereShadowPlane.position.y = plane.position.y + 0.01;
 
   //  ---------------------- SHADOWS RELATED ----------------------
   // --------------------------------------------------------------
   // --------------------------------------------------------------
   // --------------------------------------------------------------
+  pointLight.castShadow = true;
+
   spotLight.castShadow = true;
+
+  directionalLight.castShadow = true;
+
+  // ---------------------------------
+  sphere.castShadow = true;
+
+  plane.receiveShadow = true;
+
+  console.log({ shadow: directionalLight.shadow });
+  // ---------------------------------------------------------
+
+  pointLight.shadow.mapSize.width = 1024;
+  pointLight.shadow.mapSize.height = 1024;
+
+  pointLight.shadow.camera.near = 0.1;
+  pointLight.shadow.camera.far = 5;
+
+  // ---------------------------------------------------------
 
   spotLight.shadow.mapSize.width = 1024;
   spotLight.shadow.mapSize.height = 1024;
@@ -103,14 +171,6 @@ if (canvas) {
   spotLight.shadow.camera.far = 6;
 
   // --------------------------------------------
-
-  directionalLight.castShadow = true;
-
-  sphere.castShadow = true;
-
-  plane.receiveShadow = true;
-
-  console.log({ shadow: directionalLight.shadow });
 
   directionalLight.shadow.mapSize.width = 1024;
   directionalLight.shadow.mapSize.height = 1024;
@@ -127,6 +187,8 @@ if (canvas) {
 
   directionalLight.shadow.radius = 10;
 
+  // --------------------------------------------------------
+
   const directionalLightCameraHelper = new THREE.CameraHelper(
     directionalLight.shadow.camera
   );
@@ -138,12 +200,19 @@ if (canvas) {
 
   spotLightCameraHelper.visible = false;
 
+  const pointLightCameraHelper = new THREE.CameraHelper(
+    pointLight.shadow.camera
+  );
+  scene.add(pointLightCameraHelper);
+
+  pointLightCameraHelper.visible = false; // after we set near, far, mapSize we can do this
+
   // --------------------------------------------------------------
   // --------------------------------------------------------------
   // --------------------------------------------------------------
   // --------------------------------------------------------------
 
-  scene.add(sphere, plane);
+  scene.add(sphere, plane, sphereShadowPlane);
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -244,11 +313,12 @@ if (canvas) {
 
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // more than 2 is unnecessary
 
-  // ------ ACTIVTING SHADOW MAPS ------
+  // ------ SHADOW MAPS ------
   // ---------------------------------------------------
   // ---------------------------------------------------
   // ---------------------------------------------------
-  renderer.shadowMap.enabled = true;
+  // renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = false;
 
   // shadow algorythms
   //  BasicShadowMap  ---   perfoant but lousy quality
@@ -289,6 +359,15 @@ if (canvas) {
     // for dumping to work
     orbit_controls.update();
 
+    // updating sphere and plane that represent shadow -----
+    sphere.position.x = sphereShadowPlane.position.x =
+      Math.sin(elapsedTime) * 1.5;
+    sphere.position.z = sphereShadowPlane.position.z =
+      Math.cos(elapsedTime) * 1.5;
+
+    sphere.position.y = Math.abs(Math.sin(elapsedTime * 3));
+    sphereShadowPlane.scale.setScalar(Math.abs(Math.sin(elapsedTime * 3)));
+    //------------------------------------------------------
     renderer.render(scene, camera);
 
     window.requestAnimationFrame(tick);

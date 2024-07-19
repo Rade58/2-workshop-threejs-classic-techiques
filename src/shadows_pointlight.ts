@@ -1,5 +1,5 @@
-// added shadow
-// for spotlight
+// added shadows
+// for point light
 import * as THREE from "three";
 import { FontLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
@@ -47,7 +47,7 @@ if (canvas) {
 
   scene.add(ambientLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
 
   directionalLight.position.set(2, 2, -1);
 
@@ -60,12 +60,17 @@ if (canvas) {
   );
   // scene.add(directionalLightHelper);
 
-  const spotLight = new THREE.SpotLight(0xffffff, 0.94, 10, Math.PI * 0.3);
+  const spotLight = new THREE.SpotLight(0xffffff, 0.4, 10, Math.PI * 0.3);
 
   spotLight.position.set(0, 2, 2);
 
   scene.add(spotLight);
   scene.add(spotLight.target);
+
+  const pointLight = new THREE.PointLight(0xffffff, 0.3);
+  scene.add(pointLight);
+
+  pointLight.position.set(-1, 1, 0);
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -92,7 +97,27 @@ if (canvas) {
   // --------------------------------------------------------------
   // --------------------------------------------------------------
   // --------------------------------------------------------------
+  pointLight.castShadow = true;
+
   spotLight.castShadow = true;
+
+  directionalLight.castShadow = true;
+
+  // ---------------------------------
+  sphere.castShadow = true;
+
+  plane.receiveShadow = true;
+
+  console.log({ shadow: directionalLight.shadow });
+  // ---------------------------------------------------------
+
+  pointLight.shadow.mapSize.width = 1024;
+  pointLight.shadow.mapSize.height = 1024;
+
+  pointLight.shadow.camera.near = 0.1;
+  pointLight.shadow.camera.far = 5;
+
+  // ---------------------------------------------------------
 
   spotLight.shadow.mapSize.width = 1024;
   spotLight.shadow.mapSize.height = 1024;
@@ -103,14 +128,6 @@ if (canvas) {
   spotLight.shadow.camera.far = 6;
 
   // --------------------------------------------
-
-  directionalLight.castShadow = true;
-
-  sphere.castShadow = true;
-
-  plane.receiveShadow = true;
-
-  console.log({ shadow: directionalLight.shadow });
 
   directionalLight.shadow.mapSize.width = 1024;
   directionalLight.shadow.mapSize.height = 1024;
@@ -127,6 +144,8 @@ if (canvas) {
 
   directionalLight.shadow.radius = 10;
 
+  // --------------------------------------------------------
+
   const directionalLightCameraHelper = new THREE.CameraHelper(
     directionalLight.shadow.camera
   );
@@ -137,6 +156,13 @@ if (canvas) {
   scene.add(spotLightCameraHelper);
 
   spotLightCameraHelper.visible = false;
+
+  const pointLightCameraHelper = new THREE.CameraHelper(
+    pointLight.shadow.camera
+  );
+  scene.add(pointLightCameraHelper);
+
+  pointLightCameraHelper.visible = false; // after we set near, far, mapSize we can do this
 
   // --------------------------------------------------------------
   // --------------------------------------------------------------
