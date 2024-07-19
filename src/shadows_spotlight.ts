@@ -1,18 +1,5 @@
 // shadows
-// we activate shadowMap on renderer
-/// in our case (we have very simple scene)
-/// we `castShadow` from a sphere
-/// and plane should `receiveShadow`
-
-// works only with PointLight, DirectionalLight, SpotLight (you must `castShadow` from it)
-
-// after we do all of mentioned, the shadow will be visible.
-// but it won't look to good, we need to optimize it
-// and there is a lot we did
-
-// we set most of the optimization on DirectionalLight instance
-// but also we set some on renderer
-
+// for spotlight
 import * as THREE from "three";
 import { FontLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
@@ -56,11 +43,11 @@ if (canvas) {
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
   //---------------------------------------------------------------------------------------
-  const ambientLight = new THREE.AmbientLight(0xffffff);
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
 
   scene.add(ambientLight);
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
 
   directionalLight.position.set(2, 2, -1);
 
@@ -72,6 +59,14 @@ if (canvas) {
     "purple"
   );
   // scene.add(directionalLightHelper);
+
+  const spotLight = new THREE.SpotLight(0xffffff, 0.94, 10, Math.PI * 0.3);
+
+  spotLight.position.set(0, 2, 2);
+
+  scene.add(spotLight);
+  scene.add(spotLight.target);
+
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -97,6 +92,17 @@ if (canvas) {
   // --------------------------------------------------------------
   // --------------------------------------------------------------
   // --------------------------------------------------------------
+  spotLight.castShadow = true;
+
+  spotLight.shadow.mapSize.width = 1024;
+  spotLight.shadow.mapSize.height = 1024;
+
+  spotLight.shadow.camera.fov = 30;
+
+  spotLight.shadow.camera.near = 1;
+  spotLight.shadow.camera.far = 6;
+
+  // --------------------------------------------
 
   directionalLight.castShadow = true;
 
@@ -104,42 +110,33 @@ if (canvas) {
 
   plane.receiveShadow = true;
 
-  console.log({ shadow: directionalLight.shadow }); // DirectionalLightShadow instance
-  // we will take `mapSize` (Vector2 instance) from it (a resolution of the render)
-  // but watch for performance issues if your shadow takes too much space (If I ubderstood corectly)
+  console.log({ shadow: directionalLight.shadow });
 
-  // shadow will not have as rough edges as it did, after we set these
-  directionalLight.shadow.mapSize.width = 1024; // we must use power of two (like 512x512)
+  directionalLight.shadow.mapSize.width = 1024;
   directionalLight.shadow.mapSize.height = 1024;
 
-  //LIKE I DIDD WE CAN SET near AND far FOR THE SHADOW MAP CAMERA (**** AN INSTANCE OF OrthographicCamera ****)
-  //  WE ARE TALKING ABOUT CAMERA THAT IS A IN POINT OF VIEW OF THE LIGHT, LIKE THE LIGHT SURFACE)
   console.log({ directionalLightCamera: directionalLight.shadow.camera });
 
-  // we used camera helper (few lines bellow) for the camera of the shadow for directional light so we can debug
-  // or set `near` and `far` values
   directionalLight.shadow.camera.near = 1;
   directionalLight.shadow.camera.far = 6;
 
-  // we can set amplitude (top, bottom, up, down) (we are alo using helper for the camera to see what is changed)
-  // I would say we are limiting the surface where shadow will apear when we do this
   directionalLight.shadow.camera.top = 2;
   directionalLight.shadow.camera.bottom = -2;
   directionalLight.shadow.camera.right = 2;
   directionalLight.shadow.camera.left = -2;
-  // after this above, shadow will look better, so by reducing amplitude we will have better looking shadow
 
-  // controling blur of the shadow
-  directionalLight.shadow.radius = 10; // shadow will apear blured around edges
-
-  // We added a helper for mentioned camera (to set near, far, amplitude(left,right, top,bottom) )
+  directionalLight.shadow.radius = 10;
 
   const directionalLightCameraHelper = new THREE.CameraHelper(
     directionalLight.shadow.camera
   );
   scene.add(directionalLightCameraHelper);
-  // after you tweak lights camera values you can comment this out
   directionalLightCameraHelper.visible = false;
+
+  const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera);
+  scene.add(spotLightCameraHelper);
+
+  spotLightCameraHelper.visible = false;
 
   // --------------------------------------------------------------
   // --------------------------------------------------------------
@@ -161,6 +158,12 @@ if (canvas) {
     .max(1)
     .step(0.001)
     .name("Directionl Light intensity");
+  lightsFolder
+    .add(spotLight, "intensity")
+    .min(0)
+    .max(1)
+    .step(0.001)
+    .name("Spot Light intensity");
   lightsFolder
     .add(ambientLight, "intensity")
     .min(0)
@@ -185,6 +188,24 @@ if (canvas) {
     .max(2)
     .step(0.001)
     .name("z dirLight");
+  lightsFolder
+    .add(spotLight.position, "x")
+    .min(-2)
+    .max(2)
+    .step(0.001)
+    .name("x spotLight");
+  lightsFolder
+    .add(spotLight.position, "y")
+    .min(-2)
+    .max(2)
+    .step(0.001)
+    .name("y spotLight");
+  lightsFolder
+    .add(spotLight.position, "z")
+    .min(-2)
+    .max(2)
+    .step(0.001)
+    .name("z spotLight");
 
   const materialFolder = gui.addFolder("Material");
   materialFolder.add(material, "metalness").min(0).max(1).step(0.001);
