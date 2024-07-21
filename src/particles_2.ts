@@ -1,4 +1,14 @@
-// adding different color for each particle
+// - adding different color for each particle
+// we will do it just like we did with vertices
+// setting new attribute
+// THIS TIME THREE COORDINATES WILL REPRESENT RGB
+// don't forget to set    particlesMaterial.vertexColor = true
+
+// - animating particles
+// we can use Points as an object becaus it is as Object3D instance also
+// (with this next you need to be careful, it can be bad idea)
+// we can animate individual particles with `particlesGeometry.attributes.position.array`
+// and on every frame we need to use `particlesGeometry.attributes.position.needsUpdate = true`
 
 import * as THREE from "three";
 import { /* FontLoader, */ OrbitControls } from "three/examples/jsm/Addons.js";
@@ -71,16 +81,28 @@ if (canvas) {
   const particlesGeometry = new THREE.BufferGeometry();
 
   const count = 20000; // number of vertices
-  const positions = new Float32Array(count * 3); // every verices is represented with 3 coordinates, that is why we multiply
+  const positions = new Float32Array(count * 3);
+  //
+  const colors = new Float32Array(count * 3);
+  //
 
   for (let i = 0; i < count; i++) {
     positions[i] = (Math.random() - 0.5) * 10;
+
+    //
+    colors[i] = Math.random();
+    //
   }
 
   particlesGeometry.setAttribute(
     "position",
-    new THREE.BufferAttribute(positions, 3) // actually this 3 determines how much numbers to take for a coordinate
+    new THREE.BufferAttribute(positions, 3)
   );
+
+  //
+  particlesGeometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+  //
 
   /**
    * @name Particles-Material
@@ -92,7 +114,11 @@ if (canvas) {
 
   particlesMaterial.size = 0.1;
   particlesMaterial.sizeAttenuation = true;
-  particlesMaterial.color = new THREE.Color("#ff88cc");
+  // you can still use this, but you will have impact of this color onto our random ones
+  // particlesMaterial.color = new THREE.Color("#ff88cc");
+  //
+  particlesMaterial.vertexColors = true;
+  //
   particlesMaterial.transparent = true;
   particlesMaterial.alphaMap = particleTexture;
 
@@ -129,7 +155,7 @@ if (canvas) {
 
   const axHelp = new THREE.AxesHelper(4);
   axHelp.setColors("red", "green", "blue");
-  scene.add(axHelp);
+  // scene.add(axHelp);
 
   const orbit_controls = new OrbitControls(camera, canvas);
   // orbit_controls.enabled = false
@@ -161,7 +187,26 @@ if (canvas) {
   // ------------- Animation loop ------------------
   const clock = new THREE.Clock();
   const tick = () => {
-    // const elapsedTime = clock.getElapsedTime();
+    const elapsedTime = clock.getElapsedTime();
+    // animating particles
+
+    // particles.rotation.y = elapsedTime * 0.2;
+    // like a snow fall
+    // particles.position.y = -elapsedTime * 0.2;
+
+    // --------------------------------------------------------------
+    // animating each particle
+    for (let i = 0; i < count; i++) {
+      const i3 = i * 3;
+
+      const x = particlesGeometry.attributes.position.array[i3 + 0];
+      particlesGeometry.attributes.position.array[i3 + 1] = Math.sin(
+        elapsedTime + x
+      );
+    }
+    particlesGeometry.attributes.position.needsUpdate = true;
+
+    // --------------------------------------------------------------
 
     // for dumping to work
     orbit_controls.update();
