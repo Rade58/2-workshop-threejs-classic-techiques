@@ -195,6 +195,7 @@ if (canvas) {
     // particles.position.y = -elapsedTime * 0.2;
 
     // --------------------------------------------------------------
+    // BAD IDEA (VERY BAD FOR PERFORMANCE)
     // animating each particle
     for (let i = 0; i < count; i++) {
       const i3 = i * 3;
