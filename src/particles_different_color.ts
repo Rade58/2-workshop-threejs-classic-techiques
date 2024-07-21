@@ -1,8 +1,4 @@
-// particles can be used to create effects like rain, stars, smoke, dust, fire etc.
-// you can have thousands of particles with a reasonable frame rate
-// each particle is compose of a plane (two triangles) always facing a camera
-
-// We will be using some new constructors ike Points and PointsMaterial
+// adding different color for each particle
 
 import * as THREE from "three";
 import { /* FontLoader, */ OrbitControls } from "three/examples/jsm/Addons.js";
@@ -71,22 +67,14 @@ if (canvas) {
   /**
    * @name Parrticles-Geometry
    */
-  // instead of this
-  // const particlesGeometry = new THREE.SphereGeometry(1, 32, 32); // each vertex of the geomery will become particle
-  // we will use BufferGeometry
+
   const particlesGeometry = new THREE.BufferGeometry();
-  // const count = 50000;
-  // const count = 5000; // number of vertices
-  // const count = 50000; // number of vertices
+
   const count = 20000; // number of vertices
   const positions = new Float32Array(count * 3); // every verices is represented with 3 coordinates, that is why we multiply
 
   for (let i = 0; i < count; i++) {
-    // minus 0.5 because we also want negative vlues
     positions[i] = (Math.random() - 0.5) * 10;
-    // we will have array with 3 * 500 floating point numbers
-    // and when geometry uses these array it bill go through it
-    // in a way that every 3 numbers represent coordinate of a vertice
   }
 
   particlesGeometry.setAttribute(
@@ -102,39 +90,13 @@ if (canvas) {
     // sizeAttenuation: true,
   });
 
-  // particlesMaterial.size = 4;
-  // particlesMaterial.sizeAttenuation = false;
-  // particlesMaterial.size = 0.02;
   particlesMaterial.size = 0.1;
   particlesMaterial.sizeAttenuation = true;
-  // particlesMaterial.color = new THREE.Color("crimson");
   particlesMaterial.color = new THREE.Color("#ff88cc");
-  // we will see our particles but black is not transparent on particle, so black is overlaping other particle that gets in "square" of particle
-  // particlesMaterial.map = particleTexture;
-  // so we use texture as alpha map like this
   particlesMaterial.transparent = true;
   particlesMaterial.alphaMap = particleTexture;
-  // it's better but not perfect we can still se edges on square of the particle
 
-  // ---------------- multiple ways of fixing mentioned overlap  ---------------------------------
-
-  // ---------- These cause unusual buggs
-  // - alpha test   // value between 0 and 1       // can cause unusual bugs
-  // particlesMaterial.alphaTest = 0.001;
-
-  // for depth test we aded box mesh
-  // - depth test      (if you add new mesh you will have a bug where you'll see prticles behind the mesh as it is transparent)
-  // particlesMaterial.depthTest = false;
-
-  // (FIRST SOLUTION CONSIDERED GOOD SOLUTION) (still might have bugs but many times author of the workshop used this solution)
-  // - depth write will fix problem of particles being visible behind newly added meshes
   particlesMaterial.depthWrite = false;
-
-  // Blending is also a solution BUT IT WILL IMPACT PERFORMANCE
-  // WE use it in combination with        particlesMaterial.depthWrite = false;
-
-  // particlesMaterial.blending = THREE.AdditiveBlending;
-  // also add way more particles to test this, above 50 000 for example
 
   //------------------------------------------------
 
@@ -144,14 +106,6 @@ if (canvas) {
   const particles = new THREE.Points(particlesGeometry, particlesMaterial);
 
   scene.add(particles);
-
-  // to see how  dept   solutionss causes mentioned error
-  /* scene.add(
-    new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1),
-      new THREE.MeshBasicMaterial({ color: "purple" })
-    )
-  ); */
 
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
@@ -207,7 +161,7 @@ if (canvas) {
   // ------------- Animation loop ------------------
   const clock = new THREE.Clock();
   const tick = () => {
-    const elapsedTime = clock.getElapsedTime();
+    // const elapsedTime = clock.getElapsedTime();
 
     // for dumping to work
     orbit_controls.update();
