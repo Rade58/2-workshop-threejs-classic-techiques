@@ -13,8 +13,8 @@ const gui = new GUI({
   closeFolders: false,
 });
 
-// gui.hide(); //
-
+gui.hide(); //
+// gui parameters
 const parameters = {
   // color: "#90315f",
   // subdivisions: 1,
@@ -53,7 +53,8 @@ if (canvas) {
   // ------ MATERIAL ------
   const material = new THREE.MeshStandardMaterial();
   material.roughness = 0.4;
-  material.color = new THREE.Color(parameters.materialColor);
+  // material.color = new THREE.Color(parameters.materialColor);
+  material.color = new THREE.Color("crimson");
 
   // --------------------------------------------------------------
   // ------ GEOMETRIES ------
