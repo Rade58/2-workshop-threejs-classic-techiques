@@ -64,6 +64,10 @@ section.content div {
   /*  */
   /* z-index: 200; */
   position: relative;
+
+  /*  */
+  text-transform: uppercase;
+
 }
 
 section.content div:nth-of-type(2n){
