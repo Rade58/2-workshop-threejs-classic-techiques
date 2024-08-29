@@ -1,3 +1,5 @@
+// parallax is the action of seeing one object through different observation points
+// we will use cursor position in this case
 import * as THREE from "three";
 import { FontLoader, OrbitControls } from "three/examples/jsm/Addons.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
@@ -161,6 +163,13 @@ if (canvas) {
   // -----------------------------------------------------------------------
   // -----------------------------------------------------------------------
 
+  // we decided to add camea to  group to fix problem
+  // when we animating camera in tick function, and override happens because
+  // few different event liseners are impacting position of the camera (scroll and mousemove)
+
+  const cameraGroup = new THREE.Group();
+  scene.add(cameraGroup);
+
   const camera = new THREE.PerspectiveCamera(
     75,
     sizes.width / sizes.height,
@@ -169,12 +178,13 @@ if (canvas) {
     100
   );
 
-  camera.position.z = 3;
+  camera.position.z = 4;
   /* 
   camera.position.x = 1;
   camera.position.y = 1; */
 
-  scene.add(camera);
+  cameraGroup.add(camera);
+  // scene.add(camera);
 
   const axHelp = new THREE.AxesHelper(4);
   axHelp.setColors("red", "green", "blue");
@@ -223,18 +233,47 @@ if (canvas) {
    */
   let scrollY = window.screenY;
 
-  console.log({ scrollY });
+  // console.log({ scrollY });
 
   window.addEventListener("scroll", () => {
     // like I said, we will use this value to update camera in tick function
     scrollY = window.scrollY;
 
-    console.log({ scrollY });
+    // console.log({ scrollY });
   });
 
-  // ---------------------------------
-  // ---------------------------------
-  // ---------------------------------
+  // --------------------------------------------------
+  // ---------- FOR PARALLAX --------------------------
+  /**
+   * Cursor
+   */
+  const cursor = { x: 0, y: 0 };
+  cursor.x = 0;
+  cursor.y = 0;
+
+  window.addEventListener("mousemove", (e) => {
+    // console.log(e.offsetX, e.offsetY);
+    // cursor.x = e.clientX; // value in pixels, keep that in mind
+    // cursor.y = e.clientY;
+    // console.log(cursor.x, cursor.y);
+    // console.log(cursor);
+
+    // cursor.x = e.clientX / sizes.width; // normalizing valus to be between 0 and 1
+    // cursor.y = e.clientY / sizes.height;
+
+    // but since we want positive and negative values we do it like this
+    // values are going to be between -0.5 and 0.5
+    // we define this because we want to move camera up and down and left and right
+    cursor.x = e.clientX / sizes.width - 0.5;
+    cursor.y = e.clientY / sizes.height - 0.5;
+    // we are using this values in tick function
+
+    // console.log(cursor);
+  });
+
+  // --------------------------------------------------
+  // --------------------------------------------------
+  // --------------------------------------------------
 
   // ------------- Animation loop ------------------
   const clock = new THREE.Clock();
@@ -244,18 +283,28 @@ if (canvas) {
     // for dumping to work
     // orbit_controls.update();
 
-    // using scrollY value to make camer move
+    // using scrollY value to make camer move (we defined this earlier)
     // -------------------------------------
-    // at first let's pla around
+    // at first let's play around
     // camera.position.y = -scrollY * 0.001 - objectDistance;
     // keep in mind that     sizes.height     is height of our viewport
     // camera.position.y = -scrollY / sizes.height;
     // after playing around we came to this
     // mltiplying by distance between two object
+
     camera.position.y = (-scrollY / sizes.height) * objectDistance;
+    // -------------------------------------
+    // For parallax
+    const parallaxX = cursor.x;
+    // inverting cursor.y
+    const parallaxY = -cursor.y;
+    // instead of this we will move cameraGroup
+    // camera.position.x = parallaxX;
+    // camera.position.y = parallaxY;
+    cameraGroup.position.x = parallaxX;
+    cameraGroup.position.y = parallaxY;
 
     // -------------------------------------
-    //
 
     // rotaitng our meshes
     for (const mesh of sectionMeshes) {
