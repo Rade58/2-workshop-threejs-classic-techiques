@@ -51,7 +51,6 @@ section.content div {
   /* height: 100svh; */
   height: 100lvh;
   /* border-top: crimson solid 1px; */
-  border-bottom: crimson solid 1px;
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
@@ -69,6 +68,13 @@ section.content div {
   text-transform: uppercase;
 
 }
+
+section.content div.show_border {
+  border-bottom: crimson solid 1px;
+
+}
+
+
 
 section.content div:nth-of-type(2n){
   justify-content: right;
